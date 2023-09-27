@@ -2,8 +2,8 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
-import { MongooseModule } from '@nestjs/mongoose';
 import { DatabaseModule } from './database/database.module'
+import { UserModule } from './user/user.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -11,7 +11,8 @@ import { DatabaseModule } from './database/database.module'
       envFilePath: '.development.env',
 
     }),
-    DatabaseModule
+    DatabaseModule,
+    UserModule
 ],
   controllers: [AppController],
   providers: [AppService],
