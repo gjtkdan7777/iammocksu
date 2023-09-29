@@ -1,3 +1,4 @@
+
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -9,12 +10,10 @@ import { AuthModule } from './auth/auth.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal:true,
-      envFilePath: '.development.env',
-
     }),
     DatabaseModule,
     UsersModule,
-    AuthModule
+    AuthModule,
 ],
   controllers: [AppController],
   providers: [AppService],

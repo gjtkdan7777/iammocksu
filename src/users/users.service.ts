@@ -1,5 +1,5 @@
 import { Model } from 'mongoose';
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, Logger } from '@nestjs/common';
 import { Users } from './interfaces/users.interfaces';
 import { CreateUsersDto } from './dto/create-users.dto';
 
@@ -19,7 +19,7 @@ export class UsersService {
     return this.usersModel.find().exec();
   }
 
-  async findOne(name: string): Promise<Users | undefined> {
-    return this.usersModel.findOne({ name }).exec();
+  async findOne(id: string): Promise<Users | undefined> {
+    return this.usersModel.findOne({ id }).exec();
   }
 }

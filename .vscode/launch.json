@@ -1,0 +1,16 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "type": "node",
+        "request": "launch",
+        "name": "Debug Nest App",
+        "program": "${workspaceFolder}/node_modules/@nestjs/cli/bin/nest.js",
+        "args": ["start", "--watch"],
+        "cwd": "${workspaceFolder}",
+        "runtimeArgs": ["-r", "ts-node/register"],
+        "internalConsoleOptions": "openOnSessionStart",
+        "outFiles": ["${workspaceFolder}/dist/**/*.js"]
+      }
+    ]
+  }
