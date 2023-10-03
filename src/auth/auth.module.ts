@@ -6,29 +6,19 @@ import { UserService } from 'src/user/user.service';
 import { UserProviders } from 'src/user/user.providers';
 import { DatabaseModule } from '../database/database.module';
 import { LocalStrategy } from './local.strategy';
-import { AuthController } from './auth.controller';
-import { JwtModule } from '@nestjs/jwt';
-import { ConfigModule, ConfigService } from '@nestjs/config'; 
+import { ConfigModule } from '@nestjs/config'; 
+import { SessionSerializer } from './session.serializer';
 @Module({
   imports: [
     ConfigModule,
     DatabaseModule, 
     UsersModule, 
     PassportModule.register({
-      defaultStrategy: 'local'
+      session:true
     }),
-    JwtModule.registerAsync({
-      imports:[ConfigModule],
-      useFactory:async (configService: ConfigService) => ({
-        secret: configService.get<string>('SECRET_KEY'), // .env에서 시크릿 키 가져옴
-        signOptions: { expiresIn: '1h' },
-      }),
-      inject: [ConfigService], // ConfigService 주입
-
-    })
   ],
-  controllers:[AuthController],
-  providers: [AuthService, UserService, ...UserProviders, LocalStrategy],
+  controllers:[],
+  providers: [AuthService, UserService, ...UserProviders, LocalStrategy, SessionSerializer],
   exports:[LocalStrategy, PassportModule]
 })
 export class AuthModule {}

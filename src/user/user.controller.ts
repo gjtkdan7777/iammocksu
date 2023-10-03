@@ -1,28 +1,53 @@
-import { Controller, Get, Post, Body, Param, UseFilters } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, UseFilters, Request, UseGuards } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserService } from './user.service';
 import { User } from './interfaces/user.interfaces';
 import { HttpExceptionFilter } from 'src/exception/http-exception.filter';
+import * as bcrypt from 'bcrypt';
+import { LocalAuthGuard } from 'src/auth/local.auth.guard';
+import { AuthenticatedGuard } from 'src/auth/authenticated.guard';
 
 @Controller('user')
-@UseFilters(new HttpExceptionFilter)
+// @UseFilters(new HttpExceptionFilter)
 export class UserController {
   constructor(private readonly usersService: UserService) {}
 
 
-  @Post('register')
-  async register(@Body() createUserDto: CreateUserDto) {
-    // createUserDto는 사용자가 제출한 회원가입 정보를 담고 있어야 합니다.
-    return this.usersService.register(createUserDto);
+  @Post('signup')
+  async addUser(@Body() createUserDto: CreateUserDto):Promise<object> {
+    const { password } = createUserDto
+    const saltOrRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltOrRounds);
+    const hashedUser = {...createUserDto, password:hashedPassword}
+    const user = await this.usersService.addUser(hashedUser);
+    return {
+      message:'SUCCESS',
+      user,
+    }
   }
 
-  @Get()
-  async findAll(): Promise<User[]> {
-    return this.usersService.findAll();
+  @UseGuards(LocalAuthGuard)
+  @Post('login')
+  login(@Request() req ): any {
+    return {
+      user: req.user,
+      msg: 'User logged in'
+    }
+
   }
 
-  @Get(':id')
-  async findOne(@Param('name') name : string ): Promise<User> {
-    return this.usersService.findOne(name);
+  @UseGuards(AuthenticatedGuard)
+  @Get('protected')
+  getHello(@Request() req): JSON {
+    return req.user;
+  }
+
+  @Get('logout')
+  logout(@Request() req): any {
+    req.session.destroy();
+    return { 
+      msg: 'DESTROY SESSION',
+      session: req.session
+    }
   }
 }

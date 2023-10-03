@@ -1,29 +1,27 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, NotAcceptableException, Logger } from '@nestjs/common';
 import { UserService } from '../user/user.service';
-import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly usersService: UserService,
-    private readonly jwtService: JwtService,
 ) {}
 
-  async validateUser(name: string, pass: string): Promise<any> {
-    const user = await this.usersService.findOne(name);
-    if (user && user.password === pass) {
-      const { password, ...result } = user;
-      return result;
-    }
-    return null;
+async validateUser(id: string, password: string): Promise<any> {
+  const user = await this.usersService.findOne(id);
+  if (!user) {
+    throw new NotAcceptableException('NOT FIND USER');
   }
-
-  async login(user: any) {
-    // 사용자 정보를 기반으로 JWT 토큰 생성
-    const payload = { sub: user.id, username: user.id };
+  const passwordValid = await bcrypt.compare(password, user.password)
+  if (user && passwordValid) {
     return {
-      access_token: this.jwtService.sign(payload),
+      userId: user.id,
+      userName: user.name
     };
   }
+  return null;
+}
+
 
 }

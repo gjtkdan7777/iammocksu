@@ -23,18 +23,15 @@ export class UserService {
     return this.userModel.findOne({ id }).exec();
   }
   
-  async register(createUserDto: CreateUserDto): Promise<User | Error> {
+  async addUser(createUserDto: CreateUserDto): Promise<User | Error> {
 
-    // const existingUser = await this.findOne(createUserDto.id) // 기존사용자
-    // if(existingUser) {
-    //   const exception = new HttpException('id already exists', HttpStatus.BAD_REQUEST)
-    //   Logger.error(exception)
-    //   throw exception
-    // }
-    // throw new Error('Username already exists.');
     try {
-      const createdUser = await new this.userModel(createUserDto).save();
-      return createdUser;
+      const existingUser = await this.findOne(createUserDto.id) // 기존사용자
+      if(existingUser) {
+        throw new HttpException('ALREADY SIGNUP', HttpStatus.BAD_REQUEST) // 같은 아이디가 있을떄
+      }
+      
+      return await new this.userModel(createUserDto).save();
     } catch (error) {
       throw new HttpException(error, HttpStatus.BAD_REQUEST)
     } 
